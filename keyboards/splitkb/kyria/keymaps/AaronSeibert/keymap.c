@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "print.h"
 
 enum layers {
     _BASE = 0,
@@ -22,16 +23,17 @@ enum layers {
     _NUMPAD,
     _FUNCTION,
     _SHORT,
+    _SPACES,
 };
 
 // Aliases for readability
 #define FKEYS    MO(_FUNCTION)
 #define RAISE    MO(_RAISE)
 #define LOWER    MO(_LOWER)
+#define SPCS_QUOT MT(_SPACES, KC_QUOTE)
 
 #define NPAD_ESC LT(_NUMPAD, KC_ESC)
 #define ENT_SHORT LT(_SHORT, KC_ENT)
-#define CTL_QUOT MT(MOD_RCTL, KC_QUOTE)
 #define CTL_MINS MT(MOD_RCTL, KC_MINUS)
 #define ALT_ENT  MT(MOD_LALT, KC_ENT)
 
@@ -92,15 +94,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * | LShift |   Z  |   X  |   C  |   V  |   B  | [ {  |CapsLk|  |F-keys|  ] } |   N  |   M  | ,  < | . >  | /  ? | RShift |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |F-Keys|   ←  |   →  |Lower | Space|  | LAlt/|Raise |   ↑  |   ↓  | Menu |
+ *                        |F-Keys|   ←  |Lower |Raise |  →   |  | LAlt/|Raise |   ↑  |   ↓  | Menu |
  *                        |      |      |      |      |      |  | Enter|      |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [_BASE] = LAYOUT(
      KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T  ,                                         KC_Y  ,  KC_U  ,  KC_I  ,   KC_O ,   KC_P , KC_BSPC ,
-     NPAD_ESC,CTL_LP,  ALT_LR , CMD_LM ,   KC_F ,   KC_G  ,                                         KC_H  ,  KC_J  , CMD_RM , ALT_RR , CTL_RP , CTL_QUOT,
+     NPAD_ESC,CTL_LP,  ALT_LR , CMD_LM ,   KC_F ,   KC_G  ,                                         KC_H  ,  KC_J  , CMD_RM , ALT_RR , CTL_RP , SPCS_QUOT,
      KC_LSFT , KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B  , KC_LBRC , TD(TD_CCCP)  ,     FKEYS   , KC_RBRC , KC_N,  KC_M  , KC_COMM, KC_DOT , KC_SLSH, KC_RSFT ,
-                                FKEYS , KC_LEFT, KC_RIGHT, LOWER   , RAISE  ,      ENT_SHORT, KC_SPC  ,KC_UP, KC_DOWN, KC_APP
+                                FKEYS , KC_LEFT, LOWER   , RAISE  ,KC_RIGHT,       ENT_SHORT, _______, KC_SPC, _______, KC_APP
     ),
 /*
  * RAISE Layer: Media, navigation
@@ -110,7 +112,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
  * |        |  GUI |  Alt | Ctrl | Shift|      |                              | PgDn |  ←   |   ↓  |   →  | VolDn| Insert |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |      |      |      |      |      |      |ScLck |  |      |      | Pause|M Prev|M Play|M Next|VolMut| PrtSc  |
+ * |        |      |      |      |      |      |      |ScLck |  |      |      | Pause|M Prev|M Play|M Next|VolMut| PrtSc  |]
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
  *                        |      |      |      |      |      |  |      |      |      |      |      |
  *                        |      |      |      |      |      |  |      |      |      |      |      |
@@ -200,12 +202,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_SHORT] = LAYOUT(
-      _______,LSG(KC_1),LSG(KC_2),LSG(KC_3),LSG(KC_4),LSG(KC_5),                                      LSG(KC_6),LSG(KC_7),LSG(KC_8),LSG(KC_9),LSG(KC_0), _______,
+      _______,LSG(KC_1),LSG(KC_2),LSG(KC_3),LSG(KC_4),LSG(KC_5),                                     LSG(KC_6),LSG(KC_7),LSG(KC_8),LSG(KC_9),LSG(KC_0), _______,
       _______, G(KC_1) , G(KC_2) , G(KC_3) , G(KC_4) , G(KC_5) ,                                       G(KC_6) , G(KC_7) , G(KC_8) , G(KC_9) , G(KC_0) , _______,
-      _______,   KC_1 ,   KC_2 ,   KC_3 ,   KC_4 ,   KC_5 , _______, _______, _______, _______,   KC_6 ,   KC_7 ,   KC_8 ,   KC_9 ,   KC_0 , _______,
+      _______,  KC_1 ,   KC_2 ,   KC_3 ,   KC_4 ,   KC_5 , _______, _______, _______, _______,   KC_6 ,   KC_7 ,   KC_8 ,   KC_9 ,   KC_0 , _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     ),
-
+/*
+ * MOOM Layer: MOOM Keyboard Shortcuts
+ *
+ *
+ *
+ *
+ * ,-------------------------------------------.                              ,-------------------------------------------.
+ * |        |  1   |  2   |  3   |  4   |  5   |                              |   6  |  7   |  8   |  9   |  0   |        |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
+ * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
+ * |        |      |      |      |      |      |      |      |  |      |      |      |      |      |      |      |        |
+ * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
+ *                        |      |      |      |      |      |  |      |      |      |      |      |
+ *                        |      |      |      |      |      |  |      |      |      |      |      |
+ *                        `----------------------------------'  `----------------------------------'
+ */
+    [_SPACES] = LAYOUT(
+      HYPR(KC_GRV) ,HYPR(KC_1),HYPR(KC_2),HYPR(KC_3),HYPR(KC_4),HYPR(KC_5),                                    HYPR(KC_6),HYPR(KC_7),HYPR(KC_8),HYPR(KC_9), _______, _______,
+      HYPR(KC_TILD),HYPR(KC_A),HYPR(KC_S),HYPR(KC_D),HYPR(KC_F),HYPR(KC_F),                                    HYPR(KC_H),HYPR(KC_J),HYPR(KC_K),HYPR(KC_L), _______, _______,
+      HYPR(KC_PIPE),HYPR(KC_Z),HYPR(KC_X),HYPR(KC_C),HYPR(KC_V),HYPR(KC_B), _______, _______, _______, _______,HYPR(KC_N),HYPR(KC_M),HYPR(KC_COMM),HYPR(KC_DOT), _______, _______,
+                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    ),
 /*
  * Base Layer: Colemak DH
  *
@@ -251,6 +275,27 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 */
 };
+
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    if (index == 0) { /* First encoder */
+        if (clockwise) {
+            tap_code(KC_VOLD);
+			print("volu");
+        } else {
+            tap_code(KC_VOLU);
+			print("vold");
+        }
+    } else if (index == 1) { /* Second encoder */
+        if (clockwise) {
+            tap_code(KC_UP);
+			print("u");
+        } else {
+            tap_code(KC_DOWN/);
+			print("d");
+        }
+    }
+    return false;
+}
 
 #ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
